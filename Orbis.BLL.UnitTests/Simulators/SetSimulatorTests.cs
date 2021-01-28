@@ -27,23 +27,34 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
             _repository.Verify();
         }
 
-        //[Test]
-        //public void TestSimulateSetPlayerWins()
-        //{
-        //    var player = new Player("a");
-        //    var opponent = new Player("b");
-        //
-        //    var gameResult = new GameScore(player, "a 5:0 b");
-        //
-        //    _mockGameSimulator
-        //        .Setup(x => x.SimulateGame(player, opponent))
-        //        .Returns(gameResult)
-        //        .Verifiable();
-        //
-        //    var result = _setSimulator.SimulateSet(player, opponent);
-        //
-        //    Assert.AreEqual(player.Id, result.SetWinner.Id);
-        //    Assert.AreEqual("Set Result: a 6 games : b 0 games", result.SetScores);
-        //}
+        [Test]
+        public void TestSimulateSetPlayerWins()
+        {
+            var player = new Player("a");
+            var opponent = new Player("b");
+
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(true);
+
+            _mockSetScore
+                .Setup(x => x.IncrementScore(player))
+                .Verifiable();
+
+            _mockSetScore
+                .Setup(x => x.GetWinner())
+                .Returns(player);
+
+            var result = _setSimulator.SimulateSet(player, opponent);
+        }
+
+        private void SetUpMockScore(bool value)
+        {
+            _mockSetScore
+                .Setup(x => x.IsOver())
+                .Returns(value);
+        }
     }
 }
