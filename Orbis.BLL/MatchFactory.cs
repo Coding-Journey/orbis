@@ -6,10 +6,16 @@ namespace OrbisTennisSimulator.BLL
     {
         public readonly IMatchSimulator MatchSimulator;
 
-        public MatchFactory()
+        public MatchFactory(Player player, Player opponent)
         {
             MatchSimulator = 
-                new MatchSimulator(new SetSimulator(new GameSimulator(new RandomSimulator())));
+                new MatchSimulator(
+                    new SetSimulator(
+                        new GameSimulator(
+                            new RandomSimulator(),
+                            new GameScore(player, opponent)),
+                        new SetScore(player, opponent)),
+                    new MatchScore(player, opponent));
         }
     }
 }

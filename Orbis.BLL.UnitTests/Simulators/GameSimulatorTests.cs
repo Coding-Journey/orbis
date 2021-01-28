@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System;
+using System.Linq;
+using Moq;
 using NUnit.Framework;
 using OrbisTennisSimulator.BLL.Simulators;
 
@@ -9,6 +11,7 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
     {
         private MockRepository _repository;
         private Mock<IRandomSimulator> _mockRandomSimulator;
+        private Mock<IScore> _mockScore;
         private GameSimulator _gameSimulator;
 
         [SetUp]
@@ -16,7 +19,8 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
         {
             _repository = new MockRepository(MockBehavior.Strict);
             _mockRandomSimulator = _repository.Create<IRandomSimulator>();
-            _gameSimulator = new GameSimulator(_mockRandomSimulator.Object);
+            _mockScore = _repository.Create<IScore>();
+            _gameSimulator = new GameSimulator(_mockRandomSimulator.Object, _mockScore.Object);
         }
 
         [TearDown]
@@ -35,28 +39,28 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
                 .Setup(x => x.GetRandomInt(2))
                 .Returns(0);
 
-            var matchResult = _gameSimulator.SimulateGame(player, opponent);
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(false);
+            SetUpMockScore(true);
 
-            Assert.AreEqual(player.Id, matchResult.MatchWinner.Id);
-            Assert.AreEqual("a", matchResult.MatchWinner.Name);
-            Assert.AreEqual("a 5:0 b", matchResult.FinalScore);
+            _mockScore
+                .Setup(x => x.IncrementScore(player))
+                .Verifiable();
+
+            _mockScore
+                .Setup(x => x.GetWinner())
+                .Returns(player);
+
+            var result = _gameSimulator.SimulateGame(player, opponent);
         }
 
-        [Test]
-        public void TestSimulateGameOpponentWins()
+        private void SetUpMockScore(bool value)
         {
-            var player = new Player("a");
-            var opponent = new Player("b");
-
-            _mockRandomSimulator
-                .Setup(x => x.GetRandomInt(2))
-                .Returns(1);
-
-            var matchResult = _gameSimulator.SimulateGame(player, opponent);
-
-            Assert.AreEqual(opponent.Id, matchResult.MatchWinner.Id);
-            Assert.AreEqual("b", matchResult.MatchWinner.Name);
-            Assert.AreEqual("a 0:5 b", matchResult.FinalScore);
+            _mockScore
+                .Setup(x => x.IsOver())
+                .Returns(value);
         }
     }
 }

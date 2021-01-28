@@ -1,53 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OrbisTennisSimulator.BLL.Simulators
 {
     public interface IMatchSimulator
     {
-        public MatchResult SimulateMatch(Player player, Player opponent);
+        public IScore SimulateMatch();
     }
     public class MatchSimulator : IMatchSimulator
     {
         private readonly ISetSimulator _setSimulator;
+        private readonly IScore _matchScore;
 
-        public MatchSimulator(ISetSimulator setSimulator)
+        public MatchSimulator(ISetSimulator setSimulator, IScore matchScore)
         {
             _setSimulator = setSimulator ?? throw new ArgumentNullException(nameof(setSimulator));
+            _matchScore = matchScore ?? throw new ArgumentNullException(nameof(matchScore));
         }
 
-        public MatchResult SimulateMatch(Player player, Player opponent)
+        public IScore SimulateMatch()
         {
-            var playerMatchScore = 0;
-            var opponentMatchScore = 0;
+            var player = _matchScore.GetPlayerScores()[0].Player;
+            var opponent = _matchScore.GetPlayerScores()[1].Player;
 
-            while(!IsMatchOver(playerMatchScore, opponentMatchScore))
+            while(!_matchScore.IsOver())
             {
                 var setResult = _setSimulator.SimulateSet(player, opponent);
-                if(setResult.SetWinner.Id == player.Id)
+                if(setResult.GetWinner().Id == player.Id)
                 {
                     // player won the set
-                    playerMatchScore++;
+                    _matchScore.IncrementScore(player);
                 }
                 else
                 {
                     // opponent won the set
-                    opponentMatchScore++;
+                    _matchScore.IncrementScore(opponent);
                 }
             }
 
-            var matchWinner = playerMatchScore > opponentMatchScore ? player : opponent;
-            var matchScore =
-                $"Match Result: {player.Name} {playerMatchScore} sets : {opponent.Name} {opponentMatchScore} sets." +
-                $"\n Congratulations {matchWinner.Name}!";
-
-            return new MatchResult(matchWinner, matchScore);
-        }
-
-        private static bool IsMatchOver(int score1, int score2)
-        {
-            return score1 >= 2 || score2 >= 2;
+            return _matchScore;
         }
     }
 }

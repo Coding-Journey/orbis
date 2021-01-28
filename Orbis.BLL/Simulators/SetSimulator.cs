@@ -4,52 +4,39 @@ namespace OrbisTennisSimulator.BLL.Simulators
 {
     public interface ISetSimulator
     {
-        public SetResult SimulateSet(Player player, Player opponent);
+        public IScore SimulateSet(Player player, Player opponent);
     }
+
     public class SetSimulator : ISetSimulator
     {
         private readonly IGameSimulator _gameSimulator;
+        private readonly IScore _setScore;
 
-        public SetSimulator(IGameSimulator gameSimulator)
+        public SetSimulator(IGameSimulator gameSimulator, IScore setScore)
         {
             _gameSimulator = gameSimulator ?? throw new ArgumentNullException(nameof(gameSimulator));
+            _setScore = setScore ?? throw new ArgumentNullException(nameof(setScore));
         }
 
-        public SetResult SimulateSet(Player player, Player opponent)
+        public IScore SimulateSet(Player player, Player opponent)
         {
-            var playerSetScore = 0;
-            var opponentSetScore = 0;
-
-            var currentGame = 0;
-
-            while(!IsSetOver(playerSetScore, opponentSetScore))
+            while(!_setScore.IsOver())
             {
-                currentGame++;
-
                 var gameResult = _gameSimulator.SimulateGame(player, opponent);
-                if (gameResult.MatchWinner.Id == player.Id)
+
+                if (gameResult.GetWinner().Id == player.Id)
                 {
                     // player won the set
-                    playerSetScore++;
+                    _setScore.IncrementScore(player);
                 }
                 else
                 {
                     // opponent won the set
-                    opponentSetScore++;
+                    _setScore.IncrementScore(opponent);
                 }
             }
 
-            var setWinner = playerSetScore > opponentSetScore ? player : opponent;
-            var setScore = $"Set Result: {player.Name} {playerSetScore} games : {opponent.Name} {opponentSetScore} games";
-            
-            return new SetResult(setWinner, setScore);
-        }
-
-        private static bool IsSetOver(int score1, int score2)
-        {
-            return
-                (score1 >= 6 || score2 >= 6)
-                && Math.Abs(score1 - score2) >= 2;
+            return _setScore;
         }
     }
 }
