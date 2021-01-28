@@ -33,10 +33,8 @@ namespace OrbisTennisSimulator.BLL.Simulators
                     opponentScore++;
                 }
             }
-
-            var isPlayerWinner = playerScore > opponentScore;
-
-            var winningPlayer = isPlayerWinner ? player : opponent;
+            
+            var winningPlayer = playerScore > opponentScore ? player : opponent;
             var finalScore = $"{player.Name} {playerScore}:{opponentScore} {opponent.Name}";
 
             return new GameResult(winningPlayer, finalScore);

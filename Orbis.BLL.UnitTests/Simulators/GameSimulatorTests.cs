@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using OrbisTennisSimulator.BLL.Simulators;
 
-namespace OrbisTennisSimulator.BLL.UnitTests
+namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
 {
     [TestFixture]
     internal class GameSimulatorTests

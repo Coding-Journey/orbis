@@ -20,7 +20,6 @@ namespace OrbisTennisSimulator.BLL.Simulators
             var playerSetScore = 0;
             var opponentSetScore = 0;
 
-            var setScore = "";
             var currentGame = 0;
 
             while(!IsSetOver(playerSetScore, opponentSetScore))
@@ -38,12 +37,10 @@ namespace OrbisTennisSimulator.BLL.Simulators
                     // opponent won the set
                     opponentSetScore++;
                 }
-
-                setScore += $"\nGame {currentGame} score: {gameResult.FinalScore}";
             }
 
-            var isPlayerSetWinner = playerSetScore > opponentSetScore;
-            var setWinner = isPlayerSetWinner ? player : opponent;
+            var setWinner = playerSetScore > opponentSetScore ? player : opponent;
+            var setScore = $"Set Result: {player.Name} {playerSetScore} games : {opponent.Name} {opponentSetScore} games";
             
             return new SetResult(setWinner, setScore);
         }

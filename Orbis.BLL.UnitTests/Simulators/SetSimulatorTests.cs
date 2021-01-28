@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using OrbisTennisSimulator.BLL.Simulators;
 
@@ -29,7 +26,7 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
         }
 
         [Test]
-        public void TestSimulateSet()
+        public void TestSimulateSetPlayerWins()
         {
             var player = new Player("a");
             var opponent = new Player("b");
@@ -44,10 +41,26 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
             var result = _setSimulator.SimulateSet(player, opponent);
 
             Assert.AreEqual(player.Id, result.SetWinner.Id);
-            Assert.AreEqual(
-                "\nGame 1 score: a 5:0 b\nGame 2 score: a 5:0 b\nGame 3 score: a 5:0 b\nGame 4 score: a 5:0 b\nGame 5 score: a 5:0 b\nGame 6 score: a 5:0 b",
-                result.SetScores);
+            Assert.AreEqual("Set Result: a 6 games : b 0 games", result.SetScores);
+        }
 
+        [Test]
+        public void TestSimulateSetOpponentWins()
+        {
+            var player = new Player("a");
+            var opponent = new Player("b");
+
+            var gameResult = new GameResult(opponent, "a 0:5 b");
+
+            _mockGameSimulator
+                .Setup(x => x.SimulateGame(player, opponent))
+                .Returns(gameResult)
+                .Verifiable();
+
+            var result = _setSimulator.SimulateSet(player, opponent);
+
+            Assert.AreEqual(opponent.Id, result.SetWinner.Id);
+            Assert.AreEqual("Set Result: a 0 games : b 6 games", result.SetScores);
         }
     }
 }
