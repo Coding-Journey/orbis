@@ -28,6 +28,17 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
         }
 
         [Test]
+        public void TestSimulateSet()
+        {
+            var player = new Player("a");
+            var opponent = new Player("b");
+
+            SetUpMockScore(true);
+
+            var result = _setSimulator.SimulateSet(player, opponent);
+        }
+
+        [Test]
         public void TestSimulateSetPlayerWins()
         {
             var player = new Player("a");
@@ -37,15 +48,12 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
             SetUpMockScore(false);
             SetUpMockScore(false);
             SetUpMockScore(false);
+            SetUpMockScore(false);
             SetUpMockScore(true);
 
             _mockSetScore
                 .Setup(x => x.IncrementScore(player))
                 .Verifiable();
-
-            _mockSetScore
-                .Setup(x => x.GetWinner())
-                .Returns(player);
 
             var result = _setSimulator.SimulateSet(player, opponent);
         }

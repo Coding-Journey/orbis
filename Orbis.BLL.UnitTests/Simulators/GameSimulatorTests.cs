@@ -30,7 +30,7 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
         }
 
         [Test]
-        public void TestSimulateGamePlayerWins()
+        public void TestSimulateGame()
         {
             var player = new Player("a");
             var opponent = new Player("b");
@@ -39,19 +39,33 @@ namespace OrbisTennisSimulator.BLL.UnitTests.Simulators
                 .Setup(x => x.GetRandomInt(2))
                 .Returns(0);
 
+            SetUpMockScore(true);
+
+            var result = _gameSimulator.SimulateGame(player, opponent);
+        }
+
+        [Test]
+        public void TestSimulateGamePlayerWins()
+        {
+            var player = new Player("a");
+            var opponent = new Player("b");
+
+            SetUpMockScore(false);
             SetUpMockScore(false);
             SetUpMockScore(false);
             SetUpMockScore(false);
             SetUpMockScore(false);
             SetUpMockScore(true);
 
+            _mockRandomSimulator
+                .Setup(x => x.GetRandomInt(2))
+                .Returns(0);
+
             _mockScore
                 .Setup(x => x.IncrementScore(player))
                 .Verifiable();
 
-            _mockScore
-                .Setup(x => x.GetWinner())
-                .Returns(player);
+            SetUpMockScore(true);
 
             var result = _gameSimulator.SimulateGame(player, opponent);
         }
