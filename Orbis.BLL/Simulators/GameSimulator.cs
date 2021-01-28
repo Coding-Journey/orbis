@@ -2,11 +2,11 @@
 
 namespace OrbisTennisSimulator.BLL.Simulators
 {
-    public interface IGameSimultor
+    public interface IGameSimulator
     {
         public GameResult SimulateGame(Player player, Player opponent);
     }
-    public class GameSimulator : IGameSimultor
+    public class GameSimulator : IGameSimulator
     {
         private readonly IRandomSimulator _randomSimulator;
 
@@ -37,7 +37,7 @@ namespace OrbisTennisSimulator.BLL.Simulators
             var isPlayerWinner = playerScore > opponentScore;
 
             var winningPlayer = isPlayerWinner ? player : opponent;
-            var finalScore = isPlayerWinner ? $"{playerScore}:{opponentScore}" : $"{opponentScore}:{playerScore}";
+            var finalScore = $"{player.Name} {playerScore}:{opponentScore} {opponent.Name}";
 
             return new GameResult(winningPlayer, finalScore);
         }
@@ -45,7 +45,7 @@ namespace OrbisTennisSimulator.BLL.Simulators
         private static bool IsGameOver(int score1, int score2)
         {
             return 
-                (score1 > 4 || score2 > 4) 
+                (score1 >= 5 || score2 >= 5) 
                 && Math.Abs(score1 - score2) >=2;
         }
     }

@@ -29,7 +29,7 @@ namespace OrbisTennisSimulator.BLL.UnitTests
         }
 
         [Test]
-        public void TestSimulateGame()
+        public void TestSimulateGamePlayerWins()
         {
             var player = new Player("a");
             var opponent = new Player("b");
@@ -40,8 +40,26 @@ namespace OrbisTennisSimulator.BLL.UnitTests
 
             var matchResult = _gameSimulator.SimulateGame(player, opponent);
 
+            Assert.AreEqual(player.Id, matchResult.MatchWinner.Id);
             Assert.AreEqual("a", matchResult.MatchWinner.Name);
-            Assert.AreEqual("5:0", matchResult.FinalScore);
+            Assert.AreEqual("a 5:0 b", matchResult.FinalScore);
+        }
+
+        [Test]
+        public void TestSimulateGameOpponentWins()
+        {
+            var player = new Player("a");
+            var opponent = new Player("b");
+
+            _mockRandomSimulator
+                .Setup(x => x.GetRandomInt(2))
+                .Returns(1);
+
+            var matchResult = _gameSimulator.SimulateGame(player, opponent);
+
+            Assert.AreEqual(opponent.Id, matchResult.MatchWinner.Id);
+            Assert.AreEqual("b", matchResult.MatchWinner.Name);
+            Assert.AreEqual("a 0:5 b", matchResult.FinalScore);
         }
     }
 }
